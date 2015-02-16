@@ -1,8 +1,6 @@
-key notecardQueryId;
-string notecardName = "UUID of notecard";
-integer notecardLine;
 list stridedFriendsList;
 integer strideLength;
+float dataserverTimeout = 600.0;
 
 integer fncStrideCount(list lstSource, integer intStride)
 {
@@ -22,6 +20,10 @@ list fncGetStride(list lstSource, integer intIndex, integer intStride)
 }
 
 default {
+	key notecardQueryId;
+	string notecardName = "UUID of notecard";
+	integer notecardLine;
+	
 	state_entry() {
 		if (llGetInventoryKey(notecardName) == NULL_KEY)
 		{
@@ -43,8 +45,8 @@ default {
 			else
 			{
 				++notecardLine;
-				llOwnerSay("Line: " + (string) notecardLine + " " + data);
-				list stride = [data, FALSE, NULL_KEY];
+				llOwnerSay("Line: " + (string) notecardLine + " " + data); //DEBUG line; remove
+				list stride = [data, FALSE, NULL_KEY, dataserverTimeout];
 				strideLength = llGetListLength(stride);
 				stridedFriendsList += stride;
 				notecardQueryId = llGetNotecardLine(notecardName, notecardLine);
@@ -54,9 +56,12 @@ default {
 }
 
 state observe {
+	integer dataserverQueueLength = 60;
+	integer pollDuration = 60;
+	
 	state_entry()
 	{
-		llSetTimerEvent(60);
+		llSetTimerEvent(pollDuration);
 	}
 	timer()
 	{
